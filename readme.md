@@ -11,15 +11,14 @@ const express = require('express');
 const app = express();
 const PORT=8000;
 
-app.get("/api/text", (req, res) => {
+//text
+app.get("/api/hello", (req, res) => {
     res.send("hello world"); 
 });
 
-app.get("/api/json", (req, res) => {
-    res.json({
-        hello: 'hello',
-        world: 'world'
-    });
+//json (an array)
+app.get("/api/people", (req, res) => {
+    res.json(people);
 });
 
 app.listen(PORT, () => console.log(`Server is listening on PORT ${PORT}`));
@@ -71,4 +70,40 @@ app.delete("/api/people/:id", (req, res) => {
     users.splice(req.params.id, 1);
     res.json({status:"success"});
 });
+```
+
+## modularize 
+
+move routes out of server.js to *routes/routes.js*
+
+in routes.js  
+the routes will need *app* but it does not exist in that other file  
+**module.exports** is the thing that is exported, so we can access the routes by wrapping them in a function
+```
+module.exports = (app) => {
+    app.get("/api/people", (req, res) => {
+        res.json(people);
+    });
+    //other routes here
+}
+```
+
+in server.js
+```
+//get what's exported
+const routes = require("./routes/routes");
+//run the function and pass in app to create the routes
+routes(app);
+```
+
+in other situations, use module.exports as an object instead of a function
+```
+module.exports.hello = () => console.log("hello");
+module.exports.goodbye = () => console.log("goodbye");
+```
+
+call specific things with dot notation (or destructure instead)
+```
+const stuff = require("./hello_goodbye");
+stuff.hello();
 ```
